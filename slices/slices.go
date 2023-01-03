@@ -3,7 +3,7 @@ package slices
 type FilterFunc[T comparable] func(e T) bool
 
 func Clone[S ~[]E, E any](s S) S {
-	// falls s nil ist und NICHT ein leeres Slice
+	// in case we got a nil, we keep it
 	if s == nil {
 		return nil
 	}
@@ -81,6 +81,14 @@ func Index[S ~[]E, E comparable](s S, e E) int {
 
 func Contains[S ~[]E, E comparable](s S, e E) bool {
 	return Index(s, e) >= 0
+} 
+
+//--------------------------------------------------------------------------------
+// Map
+//--------------------------------------------------------------------------------
+
+func Map[S ~[]E, E any, T any](s S, func(e E) T) *List[T] {
+	return &List[]{}
 }
 
 //--------------------------------------------------------------------------------
@@ -119,4 +127,13 @@ func Count[S ~[]E, E comparable](s S, f FilterFunc[E]) int {
 		}
 	}
 	return count
+}
+
+//--------------------------------------------------------------------------------
+// Join (string)
+//--------------------------------------------------------------------------------
+
+func Join[S ~[]E, E any](s S, delim string) string {
+	parts := make([]string, len(s))
+	
 }

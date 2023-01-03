@@ -9,6 +9,23 @@ import (
 // Tests
 //--------------------------------------------------------------------------------
 
+func TestClose(t *testing.T) {
+	s := []int{1, 2, 3}
+	
+	s2 := Clone(s)
+	
+	addrS := fmt.Sprintf("%p", s)
+	addrS2 := fmt.Sprintf("%p", s2)
+	
+	if addrS == addrS2 {
+		t.Errorf("no clone")
+	}
+	
+	assertEqualSlice(t, s2, "[1 2 3]")
+	assertEqual(t, len(s2), len(s))
+	assertEqual(t, cap(s2), cap(s))
+}
+
 func TestAppendSlice(t *testing.T) {
 	s := []int{1, 2, 3}
 	
@@ -85,9 +102,15 @@ func assertEqualSlice(t *testing.T, got []int, want string) {
 	}
 }
 
-func assertEqual(t *testing.T, got int, want int) {
+func assertEqual(t *testing.T, got, want int) {
 	if got != want {
 		t.Errorf("want: %d, got: %d", want, got)
+	}
+}
+
+func assertNotEqual(t *testing.T, got, dont_want int) {
+	if got == dont_want {
+		t.Errorf("don't want: %d, got: %d", dont_want, got)
 	}
 }
 
