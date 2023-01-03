@@ -9,21 +9,35 @@ import (
 // Tests
 //--------------------------------------------------------------------------------
 
-func TestClose(t *testing.T) {
+func TestClone(t *testing.T) {
 	s := []int{1, 2, 3}
 	
 	s2 := Clone(s)
 	
 	addrS := fmt.Sprintf("%p", s)
 	addrS2 := fmt.Sprintf("%p", s2)
-	
-	if addrS == addrS2 {
-		t.Errorf("no clone")
-	}
+	assertNotEqual(t, addrS, addrS2)
 	
 	assertEqualSlice(t, s2, "[1 2 3]")
 	assertEqual(t, len(s2), len(s))
 	assertEqual(t, cap(s2), cap(s))
+}
+
+func TestMap(t *testing.T) {
+	s := []string{"1", "22", "333"}
+	
+	s2 := Map(s, func(s string) int {
+		return len(s)
+	})
+	
+	assertEqualSlice(t, s2, "[1 2 3]")
+}
+
+func TestJoin(t *testing.T) {
+	s := []int{1, 2, 3}
+	
+	s2 := Join(s, ", ")
+	assertEqual(t, s2, "1, 2, 3")
 }
 
 func TestAppendSlice(t *testing.T) {
@@ -102,15 +116,15 @@ func assertEqualSlice(t *testing.T, got []int, want string) {
 	}
 }
 
-func assertEqual(t *testing.T, got, want int) {
+func assertEqual[T comparable](t *testing.T, got, want T) {
 	if got != want {
-		t.Errorf("want: %d, got: %d", want, got)
+		t.Errorf("want: %v, got: %v", want, got)
 	}
 }
 
-func assertNotEqual(t *testing.T, got, dont_want int) {
+func assertNotEqual[T comparable](t *testing.T, got, dont_want T) {
 	if got == dont_want {
-		t.Errorf("don't want: %d, got: %d", dont_want, got)
+		t.Errorf("don't want: %v, got: %v", dont_want, got)
 	}
 }
 

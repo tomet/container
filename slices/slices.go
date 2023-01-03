@@ -1,13 +1,18 @@
 package slices
 
-type FilterFunc[T comparable] func(e T) bool
+import (
+	"fmt"
+	"strings"
+)
 
-func Clone[S ~[]E, E any](s S) S {
+type FilterFunc[F comparable] func(e F) bool
+
+func Clone[T any](s []T) []T {
 	// in case we got a nil, we keep it
 	if s == nil {
 		return nil
 	}
-	s2 := make(S, len(s), cap(s))
+	s2 := make([]T, len(s), cap(s))
 	copy(s2, s)
 	return s2
 }
@@ -16,32 +21,32 @@ func Clone[S ~[]E, E any](s S) S {
 // Insert
 //--------------------------------------------------------------------------------
 
-// this is the main-function, which gets called from Insert and AppendSlice 
-func InsertSlice[S ~[]E, E any](s S, i int, o S) S {
+// this is the main-function, which gets called from Insert and AppendSlice
+func InsertSlice[T any](s []T, i int, o []T) []T {
 	l := len(s)
-	var s2 S
-	
+	var s2 []T
+
 	for j := 0; j < i; j++ {
 		s2 = append(s2, s[j])
 	}
-	
+
 	for _, v := range o {
 		s2 = append(s2, v)
 	}
-	
+
 	for i < l {
 		s2 = append(s2, s[i])
 		i++
 	}
-	
+
 	return s2
 }
 
-func AppendSlice[S ~[]E, E any](s S, s2 S) S {
+func AppendSlice[T any](s []T, s2 []T) []T {
 	return InsertSlice(s, len(s), s2)
 }
 
-func Insert[S ~[]E, E any](s S, i int, v ...E) S {
+func Insert[T any](s []T, i int, v ...T) []T {
 	return InsertSlice(s, i, v)
 }
 
@@ -49,7 +54,7 @@ func Insert[S ~[]E, E any](s S, i int, v ...E) S {
 // Remove
 //--------------------------------------------------------------------------------
 
-func RemoveAt[S ~[]E, E any](s S, i int) S {
+func RemoveAt[T any](s []T, i int) []T {
 	l := len(s) - 1
 	for i < l {
 		s[i] = s[i+1]
@@ -62,7 +67,7 @@ func RemoveAt[S ~[]E, E any](s S, i int) S {
 	}
 }
 
-func Remove[S ~[]E, E comparable](s S, e E) S {
+func Remove[T comparable](s []T, e T) []T {
 	return RemoveAt(s, Index(s, e))
 }
 
@@ -70,7 +75,7 @@ func Remove[S ~[]E, E comparable](s S, e E) S {
 // Index
 //--------------------------------------------------------------------------------
 
-func Index[S ~[]E, E comparable](s S, e E) int {
+func Index[T comparable](s []T, e T) int {
 	for i := 0; i < len(s); i++ {
 		if s[i] == e {
 			return i
@@ -79,24 +84,30 @@ func Index[S ~[]E, E comparable](s S, e E) int {
 	return -1
 }
 
-func Contains[S ~[]E, E comparable](s S, e E) bool {
+func Contains[T comparable](s []T, e T) bool {
 	return Index(s, e) >= 0
-} 
+}
 
 //--------------------------------------------------------------------------------
 // Map
 //--------------------------------------------------------------------------------
 
-func Map[S ~[]E, E any, T any](s S, func(e E) T) *List[T] {
-	return &List[]{}
+func Map[T any, F any](s []T, f func(e T) F) []F {
+	s2 := make([]F, len(s))
+
+	for i, v := range s {
+		s2[i] = f(v)
+	}
+
+	return s2
 }
 
 //--------------------------------------------------------------------------------
 // Filter
 //--------------------------------------------------------------------------------
 
-func Filter[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
-	var s2 S
+func Filter[T comparable](s []T, f FilterFunc[T]) []T {
+	var s2 []T
 	for _, v := range s {
 		if f(v) {
 			s2 = append(s2, v)
@@ -105,8 +116,8 @@ func Filter[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
 	return s2
 }
 
-func Reject[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
-	var s2 S
+func Reject[T comparable](s []T, f FilterFunc[T]) []T {
+	var s2 []T
 	for _, v := range s {
 		if !f(v) {
 			s2 = append(s2, v)
@@ -119,7 +130,7 @@ func Reject[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
 // Count
 //--------------------------------------------------------------------------------
 
-func Count[S ~[]E, E comparable](s S, f FilterFunc[E]) int {
+func Count[T comparable](s []T, f FilterFunc[T]) int {
 	count := 0
 	for _, v := range s {
 		if f(v) {
@@ -133,7 +144,9 @@ func Count[S ~[]E, E comparable](s S, f FilterFunc[E]) int {
 // Join (string)
 //--------------------------------------------------------------------------------
 
-func Join[S ~[]E, E any](s S, delim string) string {
-	parts := make([]string, len(s))
-	
+func Join[T any](s []T, delim string) string {
+	parts := Map(s, func(s T) string {
+		return fmt.Sprintf("%v", s)
+	})
+	return strings.Join(parts, delim)
 }

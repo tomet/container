@@ -1,8 +1,8 @@
 local module = "github.com/tomet/container"
 
 local packages = {
-	module.."/list",
 	module.."/slices",
+	module.."/list",
 }
 
 packages = table.concat(packages, " ")
@@ -12,7 +12,7 @@ return {
 	name = "container",
 	source_files = {"/**/*.go"},
 	targets = {
-		test = "go test -v "..packages,
+		test = "go test "..packages,
 		compile = "go build "..packages,
 	}
 }
