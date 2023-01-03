@@ -12,14 +12,12 @@ func Clone[S ~[]E, E any](s S) S {
 	return s2
 }
 
-func AppendSlice[S ~[]E, E any](s S, s2 S) S {
-	for _, v := range s2 {
-		s = append(s, v)
-	}
-	return s
-}
+//--------------------------------------------------------------------------------
+// Insert
+//--------------------------------------------------------------------------------
 
-func Insert[S ~[]E, E any](s S, i int, v E) S {
+// this is the main-function, which gets called from Insert and AppendSlice 
+func InsertSlice[S ~[]E, E any](s S, i int, o S) S {
 	l := len(s)
 	var s2 S
 	
@@ -27,7 +25,9 @@ func Insert[S ~[]E, E any](s S, i int, v E) S {
 		s2 = append(s2, s[j])
 	}
 	
-	s2 = append(s2, v)
+	for _, v := range o {
+		s2 = append(s2, v)
+	}
 	
 	for i < l {
 		s2 = append(s2, s[i])
@@ -36,6 +36,18 @@ func Insert[S ~[]E, E any](s S, i int, v E) S {
 	
 	return s2
 }
+
+func AppendSlice[S ~[]E, E any](s S, s2 S) S {
+	return InsertSlice(s, len(s), s2)
+}
+
+func Insert[S ~[]E, E any](s S, i int, v ...E) S {
+	return InsertSlice(s, i, v)
+}
+
+//--------------------------------------------------------------------------------
+// Remove
+//--------------------------------------------------------------------------------
 
 func RemoveAt[S ~[]E, E any](s S, i int) S {
 	l := len(s) - 1
@@ -54,6 +66,10 @@ func Remove[S ~[]E, E comparable](s S, e E) S {
 	return RemoveAt(s, Index(s, e))
 }
 
+//--------------------------------------------------------------------------------
+// Index
+//--------------------------------------------------------------------------------
+
 func Index[S ~[]E, E comparable](s S, e E) int {
 	for i := 0; i < len(s); i++ {
 		if s[i] == e {
@@ -66,6 +82,10 @@ func Index[S ~[]E, E comparable](s S, e E) int {
 func Contains[S ~[]E, E comparable](s S, e E) bool {
 	return Index(s, e) >= 0
 }
+
+//--------------------------------------------------------------------------------
+// Filter
+//--------------------------------------------------------------------------------
 
 func Filter[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
 	var s2 S
@@ -86,6 +106,10 @@ func Reject[S ~[]E, E comparable](s S, f FilterFunc[E]) S {
 	}
 	return s2
 }
+
+//--------------------------------------------------------------------------------
+// Count
+//--------------------------------------------------------------------------------
 
 func Count[S ~[]E, E comparable](s S, f FilterFunc[E]) int {
 	count := 0
