@@ -33,6 +33,22 @@ func TestMap(t *testing.T) {
 	assertEqualSlice(t, s2, "[1 2 3]")
 }
 
+func TestSort(t *testing.T) {
+	s := []int{3, 5, 1}
+	
+	Sort(s, func(a, b int) bool {
+		return a < b
+	})
+	
+	assertEqualSlice(t, s, "[1 3 5]")
+	
+	SortReverse(s, func(a, b int) bool {
+		return a < b
+	})
+	
+	assertEqualSlice(t, s, "[5 3 1]")
+}
+
 func TestJoin(t *testing.T) {
 	s := []int{1, 2, 3}
 	
@@ -63,6 +79,25 @@ func TestContains(t *testing.T) {
 	
 	assertTrue(t, Contains(s, 2))
 	assertFalse(t, Contains(s, 5))
+}
+
+func TestFind(t *testing.T) {
+	s := []int{1, 2, 3}
+	
+	assertEqual(t, Find(s, func(v int) bool { return v == 2 }), 1)
+	assertEqual(t, Find(s, func(v int) bool { return v == 10 }), -1)
+}
+
+func TestMatchesAny(t *testing.T) {
+	s := []int{1, 2, 3}
+	assertTrue(t, MatchesAny(s, func(i int) bool { return i == 1 }))
+	assertFalse(t, MatchesAny(s, func(i int) bool { return i == 10 }))
+}
+
+func TestMatchesAll(t *testing.T) {
+	s := []int{1, 2, 3}
+	assertTrue(t, MatchesAll(s, func(i int) bool { return i < 10 }))
+	assertFalse(t, MatchesAll(s, func(i int) bool { return i > 2 }))
 }
 
 func TestRemove(t *testing.T) {
@@ -103,6 +138,24 @@ func TestCount(t *testing.T) {
 	})
 	
 	assertEqual(t, n, 2)
+}
+
+func TestEach(t *testing.T) {
+	s := []int{1, 2, 3}
+	sum := 0
+	Each(s, func(v int) { 
+		sum += v
+	})
+	assertEqual(t, sum, 6)
+	
+	sum = 0
+	idxs := 0
+	EachIndexed(s, func(idx int, v int) {
+		sum += v
+		idxs += idx
+	})
+	assertEqual(t, sum, 6)
+	assertEqual(t, idxs, 3)
 }
 
 //--------------------------------------------------------------------------------

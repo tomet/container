@@ -2,6 +2,7 @@ package slices
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -75,6 +76,7 @@ func Remove[T comparable](s []T, e T) []T {
 // Index
 //--------------------------------------------------------------------------------
 
+// Liefert den Index des Eintrags e oder -1.
 func Index[T comparable](s []T, e T) int {
 	for i := 0; i < len(s); i++ {
 		if s[i] == e {
@@ -86,6 +88,43 @@ func Index[T comparable](s []T, e T) int {
 
 func Contains[T comparable](s []T, e T) bool {
 	return Index(s, e) >= 0
+}
+
+//--------------------------------------------------------------------------------
+// Find
+//--------------------------------------------------------------------------------
+
+// Sucht nach dem ersten Eintrag für den fn true liefert.
+// Liefert den Index oder -1.
+func Find[T comparable](s []T, fn func(T) bool) int {
+	for i, v := range s {
+		if fn(v) {
+			return i
+		}
+	}
+	return -1
+}
+
+//--------------------------------------------------------------------------------
+// Matches
+//--------------------------------------------------------------------------------
+
+func MatchesAny[T any](s []T, fn func(T) bool) bool {
+	for _, e := range s {
+		if fn(e) {
+			return true
+		}
+	}
+	return false
+}
+
+func MatchesAll[T any](s []T, fn func(T) bool) bool {
+	for _, e := range s {
+		if !fn(e) {
+			return false
+		}
+	}
+	return true
 }
 
 //--------------------------------------------------------------------------------
@@ -141,6 +180,24 @@ func Count[T comparable](s []T, f FilterFunc[T]) int {
 }
 
 //--------------------------------------------------------------------------------
+// Sort
+//--------------------------------------------------------------------------------
+
+// Sortiert das Slice in-place.
+func Sort[T any](s []T, isLessFn func(a, b T) bool) {
+	sort.Slice(s, func(i, j int) bool {
+		return isLessFn(s[i], s[j])
+	})
+}
+
+// Sortiert das Slice in umgekehrter Reihenfolge (biggest-first)
+func SortReverse[T any](s []T, isLessFn func(a, b T) bool) {
+	Sort(s, func(a, b T) bool {
+		return !isLessFn(a, b)
+	})
+}
+
+//--------------------------------------------------------------------------------
 // Join (string)
 //--------------------------------------------------------------------------------
 
@@ -149,4 +206,21 @@ func Join[T any](s []T, delim string) string {
 		return fmt.Sprintf("%v", s)
 	})
 	return strings.Join(parts, delim)
+}
+
+
+//--------------------------------------------------------------------------------
+// Each/EachIndexed
+//--------------------------------------------------------------------------------
+
+func Each[T any](s []T, fn func(T)) {
+	for _, e := range s {
+		fn(e)
+	}
+}
+
+func EachIndexed[T any](s []T, fn(func(int, T))) {
+	for i, e := range s {
+		fn(i, e)
+	}
 }

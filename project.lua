@@ -3,6 +3,7 @@ local module = "github.com/tomet/container"
 local packages = {
 	module.."/slices",
 	module.."/list",
+	module.."/maps",
 }
 
 packages = table.concat(packages, " ")
